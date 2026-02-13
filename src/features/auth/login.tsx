@@ -47,6 +47,12 @@ function LoginCard() {
         picture: u.picture || '',
       }
 
+      if (!data.access_token) {
+        console.error('No access_token in auth response:', data)
+        toast.error('Login failed: server did not return an access token.')
+        return
+      }
+
       auth.login(data.access_token, user)
       toast.success('Signed in successfully!')
       navigate({ to: '/text2image' })
