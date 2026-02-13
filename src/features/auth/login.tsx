@@ -3,7 +3,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { useAuthStore } from '@/stores/auth-store'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import api from '@/lib/api'
+import axios, { AxiosError } from 'axios'
 
 interface AuthResponse {
   access_token: string
@@ -27,8 +27,8 @@ function LoginCard() {
     }
 
     try {
-      // Exchange Google token for JWT via backend
-      const { data } = await api.post<AuthResponse>('/auth/google', {
+      // Exchange Google token for JWT via backend (plain axios, no interceptors)
+      const { data } = await axios.post<AuthResponse>('/api/auth/google', {
         token: response.credential,
       })
 
@@ -41,8 +41,14 @@ function LoginCard() {
       auth.login(data.access_token, user)
       toast.success('Signed in successfully!')
       navigate({ to: '/text2image' })
-    } catch {
-      toast.error('Authentication failed. Please try again.')
+    } catch (error) {
+      console.error('Auth error:', error)
+      if (error instanceof AxiosError) {
+        const detail = error.response?.data?.detail
+        toast.error(typeof detail === 'string' ? detail : 'Authentication failed. Please try again.')
+      } else {
+        toast.error('Authentication failed. Please try again.')
+      }
     }
   }
 
