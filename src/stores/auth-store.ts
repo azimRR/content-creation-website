@@ -1,8 +1,4 @@
 import { create } from 'zustand'
-import { getCookie, setCookie, removeCookie } from '@/lib/cookies'
-
-const AUTH_TOKEN = 'fotiha_auth_token'
-const USER_DATA = 'fotiha_user_data'
 
 interface AuthUser {
   name: string
@@ -21,11 +17,10 @@ interface AuthState {
 }
 
 export const useAuthStore = create<AuthState>()((set) => {
-  const tokenCookie = getCookie(AUTH_TOKEN)
-  const userCookie = getCookie(USER_DATA)
-
-  const initToken = tokenCookie || null
-  const initUser = userCookie ? JSON.parse(decodeURIComponent(userCookie)) : null
+  const initToken = localStorage.getItem('token')
+  const initUser = localStorage.getItem('user_data')
+    ? JSON.parse(localStorage.getItem('user_data')!)
+    : null
   const initAuthenticated = !!initToken && !!initUser
 
   return {
@@ -35,8 +30,8 @@ export const useAuthStore = create<AuthState>()((set) => {
       isAuthenticated: initAuthenticated,
       login: (token, user) =>
         set((state) => {
-          setCookie(AUTH_TOKEN, token)
-          setCookie(USER_DATA, encodeURIComponent(JSON.stringify(user)))
+          localStorage.setItem('token', token)
+          localStorage.setItem('user_data', JSON.stringify(user))
           return {
             ...state,
             auth: { ...state.auth, token, user, isAuthenticated: true },
@@ -44,8 +39,8 @@ export const useAuthStore = create<AuthState>()((set) => {
         }),
       logout: () =>
         set((state) => {
-          removeCookie(AUTH_TOKEN)
-          removeCookie(USER_DATA)
+          localStorage.removeItem('token')
+          localStorage.removeItem('user_data')
           return {
             ...state,
             auth: { ...state.auth, token: null, user: null, isAuthenticated: false },
