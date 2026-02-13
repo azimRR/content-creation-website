@@ -3,42 +3,46 @@ import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { useAuthStore } from '@/stores/auth-store'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import api from '@/lib/api'
 
-function decodeJwt(token: string) {
-  const base64Url = token.split('.')[1]
-  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
-  const jsonPayload = decodeURIComponent(
-    atob(base64)
-      .split('')
-      .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-      .join('')
-  )
-  return JSON.parse(jsonPayload)
+interface AuthResponse {
+  access_token: string
+  token_type: string
+  user: {
+    id: number
+    email: string
+    name: string
+    picture: string
+  }
 }
 
 function LoginCard() {
   const navigate = useNavigate()
   const { auth } = useAuthStore()
 
-  const handleSuccess = (response: CredentialResponse) => {
+  const handleSuccess = async (response: CredentialResponse) => {
     if (!response.credential) {
       toast.error('Login failed. No credential received.')
       return
     }
 
     try {
-      const decoded = decodeJwt(response.credential)
+      // Exchange Google token for JWT via backend
+      const { data } = await api.post<AuthResponse>('/auth/google', {
+        token: response.credential,
+      })
+
       const user = {
-        name: decoded.name || decoded.email?.split('@')[0] || 'User',
-        email: decoded.email || '',
-        picture: decoded.picture || '',
+        name: data.user.name || data.user.email.split('@')[0],
+        email: data.user.email,
+        picture: data.user.picture || '',
       }
 
-      auth.login(response.credential, user)
+      auth.login(data.access_token, user)
       toast.success('Signed in successfully!')
       navigate({ to: '/text2image' })
     } catch {
-      toast.error('Failed to decode login response.')
+      toast.error('Authentication failed. Please try again.')
     }
   }
 

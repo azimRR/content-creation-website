@@ -1,18 +1,19 @@
-BASE URL: `http://api.fotiha.uz:8000/`
-
 # Text to Image API
 
+Base URL: `http://api.fotiha.uz:8000`
 
 ## `POST /image/text2image`
+
+Full URL: `http://api.fotiha.uz:8000/image/text2image`
 
 Generate an image from a text prompt using Google Imagen 3.
 
 ### Authentication
 
-Requires Google OAuth token in the `Authorization` header.
+Requires JWT token from `POST /auth/google` (see [auth.md](auth.md)).
 
 ```
-Authorization: Bearer <google_oauth_token>
+Authorization: Bearer <jwt_token>
 ```
 
 ### Request Body
@@ -67,8 +68,7 @@ Authorization: Bearer <google_oauth_token>
 
 | Status | Detail                          |
 |--------|---------------------------------|
-| 401    | Invalid or missing OAuth token  |
-| 403    | User email not in allowed list  |
+| 401    | Invalid or missing JWT token    |
 | 422    | Invalid request body            |
 | 502    | Image generation failed         |
 
