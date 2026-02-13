@@ -1,7 +1,7 @@
 import axios, { type AxiosInstance, type AxiosResponse } from 'axios'
 import { useAuthStore } from '@/stores/auth-store'
 
-const BASE_URL = 'http://api.fotiha.uz:8000'
+const BASE_URL = '/api'
 
 const api: AxiosInstance = axios.create({
   baseURL: BASE_URL,
