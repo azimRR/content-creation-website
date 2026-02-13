@@ -2,6 +2,7 @@ BASE URL: `http://api.fotiha.uz:8000/`
 
 # Text to Image API
 
+
 ## `POST /image/text2image`
 
 Generate an image from a text prompt using Google Imagen 3.
