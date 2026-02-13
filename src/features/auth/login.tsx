@@ -33,7 +33,7 @@ function LoginCard() {
 
     try {
       // Exchange Google token for JWT via backend (plain axios, no interceptors)
-      const { data } = await axios.post<AuthResponse>('http://api.fotiha.uz:8000/auth/google', {
+      const { data } = await axios.post<AuthResponse>('https://api.fotiha.uz/auth/google', {
         token: response.credential,
       })
 
