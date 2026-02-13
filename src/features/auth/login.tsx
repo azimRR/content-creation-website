@@ -8,12 +8,17 @@ import axios, { AxiosError } from 'axios'
 interface AuthResponse {
   access_token: string
   token_type: string
-  user: {
+  // User fields can be nested or top-level
+  user?: {
     id: number
     email: string
     name: string
     picture: string
   }
+  id?: number
+  email?: string
+  name?: string
+  picture?: string
 }
 
 function LoginCard() {
@@ -32,10 +37,14 @@ function LoginCard() {
         token: response.credential,
       })
 
+      console.log('Auth response:', data)
+
+      // Handle both nested user object and flat response
+      const u = data.user || data
       const user = {
-        name: data.user.name || data.user.email.split('@')[0],
-        email: data.user.email,
-        picture: data.user.picture || '',
+        name: u.name || u.email?.split('@')[0] || 'User',
+        email: u.email || '',
+        picture: u.picture || '',
       }
 
       auth.login(data.access_token, user)
