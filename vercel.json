@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "http://api.fotiha.uz:8000/:path*" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
+  ]
+}
