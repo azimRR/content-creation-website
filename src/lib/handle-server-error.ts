@@ -18,10 +18,16 @@ export function handleServerError(error: unknown) {
   if (error instanceof AxiosError) {
     const response = error.response
     if (response?.data) {
-      errMsg = response.data.detail ||
-               response.data.message ||
-               response.data.error ||
-               `HTTP ${response.status}: ${response.statusText}`
+      const detail = response.data.detail
+      if (typeof detail === 'string') {
+        errMsg = detail
+      } else if (Array.isArray(detail)) {
+        errMsg = detail.map((d: { msg?: string }) => d.msg).filter(Boolean).join(', ') || `HTTP ${response.status}: ${response.statusText}`
+      } else {
+        errMsg = response.data.message ||
+                 response.data.error ||
+                 `HTTP ${response.status}: ${response.statusText}`
+      }
     } else if (error.code === 'ECONNABORTED') {
       errMsg = 'Request timeout. Image generation may take up to 60 seconds.'
     } else if (error.code === 'ERR_NETWORK') {
